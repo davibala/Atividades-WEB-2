@@ -8,7 +8,9 @@ use App\Models\Author;
 use App\Models\Category;
 use App\Models\User;
 use Illuminate\Http\Request;
-
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
+use Illuminate\Support\Facades\Storage;
 class BookController extends Controller
 {
 
@@ -42,19 +44,36 @@ class BookController extends Controller
     }
 
     // Salvar livro com input select
-    public function storeWithSelect(Request $request)
-    {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'publisher_id' => 'required|exists:publishers,id',
-            'author_id' => 'required|exists:authors,id',
-            'category_id' => 'required|exists:categories,id',
-        ]);
-
-        Book::create($request->all());
-
-        return redirect()->route('books.index')->with('success', 'Livro criado com sucesso.');
-    }
+        public function storeWithSelect(Request $request)
+        {
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'publisher_id' => 'required|exists:publishers,id',
+                'author_id' => 'required|exists:authors,id',
+                'category_id' => 'required|exists:categories,id',
+                'img_link' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            ]);
+        
+            // Cria o gerenciador de imagem
+            $manager = new ImageManager(new Driver());
+            
+            // Processa a imagem
+            $file = $request->file('img_link');
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            
+            // Redimensiona e salva
+            $image = $manager->read($file);
+            $image->resize(200, 300);
+            Storage::disk('public')->put("images/{$filename}", $image->encode());
+            
+            // Prepara os dados para criação
+            $data = $request->all();
+            $data['img_link'] = "images/{$filename}";
+            
+            Book::create($data);
+        
+            return redirect()->route('books.index')->with('success', 'Livro criado com sucesso.');
+        }
 
 
     public function index()

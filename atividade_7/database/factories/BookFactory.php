@@ -20,10 +20,9 @@ class BookFactory extends Factory
         return [
             'title' => $this->faker->sentence(),
             'author_id' => Author::factory(),
-            'category_id' => Category::factory(), // Agora usa a CategoryFactory
+            'category_id' => Category::factory(),
             'publisher_id' => Publisher::factory(),
             'published_year' => $this->faker->year
         ];
     }
-
 }

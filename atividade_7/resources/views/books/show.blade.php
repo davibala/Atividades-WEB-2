@@ -23,9 +23,16 @@
                         {{ $book->category->name }}
                     </a>
                 </p>
+                <p><strong>Capa:</strong>
+                @if ($book->img_link)
+                    <img src="{{ asset('storage/' . $book->img_link) }}" alt="Capa do Livro1" class="img-fluid">
+                @else
+                    <img src="{{ asset('storage/' . '/images/no-image.jpg') }}" alt="Capa do Livro2" class="img-fluid">
+                @endif
+                </p>
             </div>
         </div>
-
+    <br>
         <div class="card mb-4">
             <div class="card-header">Registrar Empréstimo</div>
             <div class="card-body">
