@@ -44,36 +44,32 @@ class BookController extends Controller
     }
 
     // Salvar livro com input select
-        public function storeWithSelect(Request $request)
-        {
-            $request->validate([
-                'title' => 'required|string|max:255',
-                'publisher_id' => 'required|exists:publishers,id',
-                'author_id' => 'required|exists:authors,id',
-                'category_id' => 'required|exists:categories,id',
-                'img_link' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            ]);
-        
-            // Cria o gerenciador de imagem
-            $manager = new ImageManager(new Driver());
-            
-            // Processa a imagem
-            $file = $request->file('img_link');
-            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            
-            // Redimensiona e salva
-            $image = $manager->read($file);
-            $image->resize(200, 300);
-            Storage::disk('public')->put("images/{$filename}", $image->encode());
-            
-            // Prepara os dados para criação
-            $data = $request->all();
-            $data['img_link'] = "images/{$filename}";
-            
-            Book::create($data);
-        
-            return redirect()->route('books.index')->with('success', 'Livro criado com sucesso.');
-        }
+    public function storeWithSelect(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'publisher_id' => 'required|exists:publishers,id',
+            'author_id' => 'required|exists:authors,id',
+            'category_id' => 'required|exists:categories,id',
+            'img_link' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $manager = new ImageManager(new Driver());
+
+        $file = $request->file('img_link');
+        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+
+        $image = $manager->read($file);
+        $image->resize(200, 300);
+        Storage::disk('public')->put("images/{$filename}", $image->encode());
+
+        $data = $request->all();
+        $data['img_link'] = "images/{$filename}";
+
+        Book::create($data);
+
+        return redirect()->route('books.index')->with('success', 'Livro criado com sucesso.');
+    }
 
 
     public function index()
@@ -135,9 +131,22 @@ class BookController extends Controller
             'publisher_id' => 'required|exists:publishers,id',
             'author_id' => 'required|exists:authors,id',
             'category_id' => 'required|exists:categories,id',
+            'img_link' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $book->update($request->all());
+        
+        $file = $request->file('img_link'); 
+        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        
+        $manager = new ImageManager(new Driver()); // Instancia o gerenciador de imagens
+        $image = $manager->read($file); // Lê a imagem do arquivo
+        $image->resize(200, 300); // Redimensiona a imagem
+        Storage::disk('public')->put("images/{$filename}", $image->encode()); // Armazena a imagem redimensionada
+
+        $data = $request->all();
+        $data['img_link'] = "images/{$filename}";
+
+        $book->update($data);
 
         return redirect()->route('books.index')->with('success', 'Livro atualizado com sucesso.');
     }
@@ -145,8 +154,10 @@ class BookController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Book $book)
     {
-        //
+        $book->delete();
+
+        return redirect()->route('books.index')->with('success', 'Livro excluído com sucesso.');
     }
 }

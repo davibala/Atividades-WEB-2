@@ -27,5 +27,4 @@ class AuthorPublisherBookSeeder extends Seeder
             );
         });
     }
-
 }

@@ -66,7 +66,9 @@
             </div>
             <div>
                 <label for="img_link" class="form-label">Imagem do Livro:</label><br>
-                <input type="file" name="img_link" accept="image/*" class="form-control">
+                <img id="preview-img" src="#" alt="Pré-visualização da imagem" 
+                    class="d-none">
+                <input type="file" name="img_link" accept="image/*" class="form-control" id="img_link">
             </div>
             <br>
             <button type="submit" class="btn btn-success">Salvar</button>

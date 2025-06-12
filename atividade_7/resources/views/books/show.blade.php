@@ -24,7 +24,7 @@
                     </a>
                 </p>
                 <p><strong>Capa:</strong>
-                @if ($book->img_link)
+                @if (isset($book->img_link))
                     <img src="{{ asset('storage/' . $book->img_link) }}" alt="Capa do Livro1" class="img-fluid">
                 @else
                     <img src="{{ asset('storage/' . '/images/no-image.jpg') }}" alt="Capa do Livro2" class="img-fluid">
