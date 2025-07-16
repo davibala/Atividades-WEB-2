@@ -156,6 +156,10 @@ class BookController extends Controller
      */
     public function destroy(Book $book)
     {
+        if ($book->img_link && Storage::disk('public')->exists($book->img_link)) {
+            Storage::disk('public')->delete($book->img_link);
+        }
+
         $book->delete();
 
         return redirect()->route('books.index')->with('success', 'Livro excluído com sucesso.');
